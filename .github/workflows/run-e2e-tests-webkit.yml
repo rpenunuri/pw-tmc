@@ -1,0 +1,24 @@
+name: Run e2e tests with webkit
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: 
+      - '*'
+jobs:
+  playwright:
+    name: 'Run e2e tests'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build and run tests with Docker Compose
+        run: |
+          BROWSER=webkit docker-compose up --build --exit-code-from e2e-tests
+      - name: Upload test results
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            ./test-results
+            ./playwright-report
